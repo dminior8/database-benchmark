@@ -1,0 +1,51 @@
+services:
+
+  oracle-db:
+    image: container-registry.oracle.com/database/express:latest
+    container_name: oracle-test
+    ports:
+      - "1521:1521"
+    environment:
+      - ORACLE_PWD=YourPassword123
+    volumes:
+      - ./databases/oracle/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  postgresql:
+    image: postgres:17.3
+    container_name: postgres-test
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: postgres-test
+    ports:
+      - "5432:5432"
+    command: >
+      sh -c "echo 'Creating database with UTF-8 encoding...'; 
+      initdb --encoding=UTF8 --locale=en_US.UTF-8; 
+      docker-entrypoint.sh postgres"
+    volumes:
+      - ./databases/postgresql/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  cassandra:
+    image: cassandra:latest
+    container_name: cassandra-test
+    ports:
+      - "9042:9042"
+    environment:
+      - CASSANDRA_USER=admin
+      - CASSANDRA_PASSWORD=admin
+    volumes:
+      - ./databases/cassandra/init.cql:/docker-entrypoint-initdb.d/init.cql
+
+  mongo:
+    image: mongo:latest
+    container_name: mongo-test
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./databases/mongo/init.js:/docker-entrypoint-initdb.d/init.js

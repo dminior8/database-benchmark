@@ -1,0 +1,6 @@
+psycopg2
+pymongo
+cassandra-driver
+cython
+cryptography
+oracledb #python -m pip install oracledb --no-deps
