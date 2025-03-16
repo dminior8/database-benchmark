@@ -2,10 +2,25 @@
 
 This project compares the performance of several of the most popular SQL and NoSQL databases, i.e. PostgresSQL, Oracle, MongoDB and Apache Cassandra.
 
-## Installation
+## Requirements
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install foobar.
+- Python 3.11.x
+- Docker
+- Dependencies listed in the `requirements.txt` file.
+
+### Installing Dependencies
+To install the required libraries, run the following command:
 
 ```bash
 pip install -r requirements.txt
+```
+## Running the Project
+
+### Running via **run.sh** Script
+  ```bash
+./run.sh
+```
+### Running Directly via main.py
+```bash
+python main.py
 ```
