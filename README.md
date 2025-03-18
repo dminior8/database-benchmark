@@ -16,11 +16,11 @@ pip install -r requirements.txt
 ```
 ## Running the Project
 
-### Running via **run.sh** Script
+For the first time run via **run.sh** script to create Docker Containers
   ```bash
 ./run.sh
 ```
-### Running Directly via main.py
+After Docker's successful creation Docker Containers program can be run directly via **main.py** as well
 ```bash
 python main.py
 ```
