@@ -1,8 +1,10 @@
 FROM container-registry.oracle.com/database/enterprise:19.3.0
 
+#Set CDB name
 ENV ORACLE_SID=ORCLCDB
-ENV ORACLE_PDB=ORCLPDB1
-ENV ORACLE_PWD=YourSecurePassword
+
+#Set PDB name
+ENV ORACLE_PWD=YourPassword123
 
 COPY init.sql /docker-entrypoint-initdb.d/
 

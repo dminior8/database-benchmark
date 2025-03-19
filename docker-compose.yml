@@ -6,26 +6,27 @@ services:
     ports:
       - "1521:1521"
     environment:
+      - ORACLE_PDB=XEPDB1
       - ORACLE_PWD=YourPassword123
     volumes:
-      - ./databases/oracle/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./databases/oracle/init.sql:/docker-entrypoint-initdb.d/startup/init.sql
+
 
   postgresql:
     image: postgres:17.3
     container_name: postgres-test
-    restart: always
     environment:
-      POSTGRES_USER: postgres
+      POSTGRES_USER: healthcare
       POSTGRES_PASSWORD: root
-      POSTGRES_DB: postgres-test
+      POSTGRES_DB: healthcare-postgres
     ports:
-      - "5432:5432"
-    command: >
-      sh -c "echo 'Creating database with UTF-8 encoding...'; 
-      initdb --encoding=UTF8 --locale=en_US.UTF-8; 
-      docker-entrypoint.sh postgres"
+      - "5433:5432"
+    command: postgres
     volumes:
       - ./databases/postgresql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - app-network
+
 
   cassandra:
     image: cassandra:latest
@@ -49,3 +50,7 @@ services:
       - "27017:27017"
     volumes:
       - ./databases/mongo/init.js:/docker-entrypoint-initdb.d/init.js
+
+networks:
+  app-network:
+    driver: bridge

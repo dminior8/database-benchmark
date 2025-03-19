@@ -4,13 +4,16 @@ from cassandra.cluster import Cluster
 import oracledb
 import time
 
-# Konfiguracja połączeń do baz danych
+from databases.mongo.data_generator import generate_and_insert_data_mongo
+from databases.oracle.data_generator import generate_and_insert_data_oracle
+from databases.postgresql.data_generator import generate_and_insert_data_postgres
+
 DB_CONFIG = {
     "postgres": {
         "host": "localhost",
         "port": 5432,
-        "database": "postgres-test",
-        "user": "postgres",
+        "database": "healthcare-postgres",
+        "user": "healthcare",
         "password": "root"
     },
     "mongo": {
@@ -24,17 +27,26 @@ DB_CONFIG = {
         "port": 9042
     },
     "oracle": {
-        "dsn": "localhost:1521/XE",
-        "user": "system",
-        "password": "YourPassword123"
+        "dsn": "localhost:1521/XEPDB1",  # Upewnij się, że to jest poprawny DSN
+        "user": "SYS",
+        "password": "YourPassword123",
+        "mode": oracledb.SYSDBA  # Tutaj ustawiamy tryb SYSDBA
     }
 }
 
 def check_postgres():
     try:
-        print("Próba połączenia z PostgreSQL...")
-        conn = psycopg2.connect(**DB_CONFIG["postgres"])
-        conn.set_client_encoding('LATIN1')
+        conn = psycopg2.connect(#database="postgres", user="postgres", password="admin")
+            # **DB_CONFIG
+            database="healthcare-postgres",
+            user="healthcare",
+            password="root",
+            host="localhost",
+            port = 5433
+        )
+
+
+        # conn.set_client_encoding('UTF8')
         conn.close()
         print("PostgreSQL is running!")
     except Exception as e:
@@ -58,16 +70,26 @@ def check_cassandra():
 
 def check_oracle():
     try:
-        conn = oracledb.connect(**DB_CONFIG["oracle"])
+        conn = oracledb.connect(
+            user=DB_CONFIG["oracle"]["user"],
+            password=DB_CONFIG["oracle"]["password"],
+            dsn=DB_CONFIG["oracle"]["dsn"],
+            mode=oracledb.SYSDBA
+        )
         conn.close()
         print("OracleDB is running!")
     except Exception as e:
         print("OracleDB connection failed:", e)
 
 if __name__ == "__main__":
-    print("Sprawdzanie statusu baz danych...")
-    time.sleep(5)  # Czekamy, aby dać kontenerom czas na uruchomienie
+    print("Checking database status...")
+    #time.sleep(10)  # Czekamy, aby dać kontenerom czas na uruchomienie
     check_postgres()
     check_mongo()
-    check_cassandra()
+    #check_cassandra()
     check_oracle()
+
+    print("\n\nGenerating and adding data to the database...")
+    generate_and_insert_data_postgres()
+    generate_and_insert_data_mongo()
+    generate_and_insert_data_oracle()
