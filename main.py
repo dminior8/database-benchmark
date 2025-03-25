@@ -7,6 +7,7 @@ import time
 from databases.mongo.data_generator import generate_and_insert_data_mongo
 from databases.oracle.data_generator import generate_and_insert_data_oracle
 from databases.postgresql.data_generator import generate_and_insert_data_postgres
+from databases.cassandra.data_generator import generate_and_insert_data_cassandra
 
 DB_CONFIG = {
     "postgres": {
@@ -86,10 +87,11 @@ if __name__ == "__main__":
     #time.sleep(10)  # Czekamy, aby dać kontenerom czas na uruchomienie
     check_postgres()
     check_mongo()
-    #check_cassandra()
+    check_cassandra()
     check_oracle()
 
     print("\n\nGenerating and adding data to the database...")
     generate_and_insert_data_postgres()
     generate_and_insert_data_mongo()
     generate_and_insert_data_oracle()
+    generate_and_insert_data_cassandra()

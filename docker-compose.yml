@@ -10,6 +10,8 @@ services:
       - ORACLE_PWD=YourPassword123
     volumes:
       - ./databases/oracle/init.sql:/docker-entrypoint-initdb.d/startup/init.sql
+    networks:
+      - app-network
 
 
   postgresql:
@@ -38,6 +40,8 @@ services:
       - CASSANDRA_PASSWORD=admin
     volumes:
       - ./databases/cassandra/init.cql:/docker-entrypoint-initdb.d/init.cql
+    networks:
+      - app-network
 
   mongo:
     image: mongo:latest
@@ -50,6 +54,8 @@ services:
       - "27017:27017"
     volumes:
       - ./databases/mongo/init.js:/docker-entrypoint-initdb.d/init.js
+    networks:
+      - app-network
 
 networks:
   app-network:

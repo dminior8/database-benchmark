@@ -1,19 +1,30 @@
 #!/bin/bash
-echo "Uruchamianie kontenerów..."
+echo "Starting containers..."
 
-# Usunięcie starych kontenerów (opcjonalne)
+# Remove old containers (optional)
 docker-compose down
-# Budowanie i uruchamianie kontenerów
+# Build and start containers
 docker-compose up -d --build
 
-echo "Oczekiwanie na uruchomienie baz danych..."
-sleep 50
+echo "Waiting for databases to start..."
+sleep 20
 
-echo "Uruchamianie testów z main.py..."
+echo "Installing dependencies..."
 source .venv/Scripts/activate
 pip install -r requirements.txt
+
+echo "Running tests from main.py..."
+# Wait until Cassandra is ready
+until docker exec -it cassandra-test cqlsh -e "SELECT now() FROM system.local"; do
+  echo "Cassandra is not up yet. Waiting..."
+  sleep 5
+done
+
+# Load data
+docker exec -i cassandra-test cqlsh -e "SOURCE '/docker-entrypoint-initdb.d/init.cql';"
+echo "CassandraDB is running!"
+
 python main.py
 
-
-echo "Testy zakończone!"
-read -p "Naciśnij dowolny klawisz, aby zamknąć..."
+echo "Tests completed!"
+read -p "Press any key to close..."
