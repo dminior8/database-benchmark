@@ -7,5 +7,7 @@ ENV ORACLE_SID=ORCLCDB
 ENV ORACLE_PWD=YourPassword123
 
 COPY init.sql /docker-entrypoint-initdb.d/
+COPY scripts /opt/oracle/scripts
+
 
 EXPOSE 1521 5500

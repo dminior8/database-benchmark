@@ -2,12 +2,16 @@ import psycopg2
 import pymongo
 from cassandra.cluster import Cluster
 import oracledb
-import time
 
 from databases.mongo.data_generator import generate_and_insert_data_mongo
 from databases.oracle.data_generator import generate_and_insert_data_oracle
 from databases.postgresql.data_generator import generate_and_insert_data_postgres
 from databases.cassandra.data_generator import generate_and_insert_data_cassandra
+
+from scripts.tests_mongo import crud_mongo
+from scripts.tests_oracle import crud_oracle
+from scripts.tests_postgresql import crud_postgres
+from scripts.tests_cassandra import crud_cassandra
 
 DB_CONFIG = {
     "postgres": {
@@ -95,3 +99,18 @@ if __name__ == "__main__":
     generate_and_insert_data_mongo()
     generate_and_insert_data_oracle()
     generate_and_insert_data_cassandra()
+
+
+    print("\n\nStarting test...")
+
+    print("\nRunning CRUD tests for Oracle...")
+    crud_oracle()
+
+    print("\nRunning CRUD tests for Cassandra...")
+    crud_cassandra()
+
+    print("\nRunning CRUD tests for MongoDB...")
+    crud_mongo()
+
+    print("\nRunning CRUD tests for PostgreSQL...")
+    crud_postgres()
