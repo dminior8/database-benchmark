@@ -1,3 +1,6 @@
+import uuid
+from datetime import datetime
+
 import pymongo
 import time
 
@@ -27,25 +30,37 @@ def crud_mongo():
         # CREATE
         start = time.time()
         for _ in range(n):
-            coll.insert_one({"column1": "test1", "column2": "value1"})
+            coll.insert_one({
+                "user_id": str(uuid.uuid4()),
+                "first_name": "John",
+                "last_name": "Doe",
+                "phone": "123456789",
+                "email": "john.doe@example.com",
+                "birth_date": datetime.strptime("1990-01-01", "%Y-%m-%d"),
+                "gender": "male",
+                "pesel": "12345678901"
+            })
         create_times.append(time.time() - start)
 
         # READ
         start = time.time()
         for _ in range(n):
-            coll.find_one({"column1": "test1"})
+            coll.find_one({"first_name": "John", "last_name": "Doe"})
         read_times.append(time.time() - start)
 
         # UPDATE
         start = time.time()
         for _ in range(n):
-            coll.update_one({"column1": "test1"}, {"$set": {"column1": "updated_value"}})
+            coll.update_one(
+                {"first_name": "John", "last_name": "Doe"},
+                {"$set": {"first_name": "Jane"}}
+            )
         update_times.append(time.time() - start)
 
         # DELETE
         start = time.time()
         for _ in range(n):
-            coll.delete_one({"column1": "updated_value"})
+            coll.delete_one({"first_name": "Jane", "last_name": "Doe"})
         delete_times.append(time.time() - start)
 
     client.close()
