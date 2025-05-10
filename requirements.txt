@@ -1,7 +1,10 @@
 psycopg2-binary
-faker
-pymongo
-cassandra-driver
+faker~=37.1.0
+pymongo~=4.12.0
+cassandra-driver~=3.29.2
 cython
 cryptography
-oracledb #python -m pip install oracledb --no-deps
+oracledb~=3.1.0
+numpy~=2.2.5
+matplotlib~=3.10.3
+#python -m pip install oracledb --no-deps

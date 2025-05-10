@@ -10,32 +10,52 @@ DB_CONFIG = {
     }
 }
 
-def crud_mongo():
-    try:
-        # Połączenie z MongoDB
-        client = pymongo.MongoClient(**DB_CONFIG["mongo"])
-        db = client["healthcare_mongo"]
-        collection = db["healthcare_collection"]
+TEST_CASES = [100, 200, 300, 500, 1_000, 5_000, 10_000, 15_000, 20_000]
 
+
+def crud_mongo():
+    create_times = []
+    read_times = []
+    update_times = []
+    delete_times = []
+
+    client = pymongo.MongoClient(**DB_CONFIG["mongo"])
+    db = client["healthcare_mongo"]
+    coll = db["healthcare_collection"]
+
+    for n in TEST_CASES:
         # CREATE
-        start_time = time.time()
-        collection.insert_one({"column1": "test1", "column2": "value1"})
-        print("MongoDB CREATE Time:", time.time() - start_time)
+        start = time.time()
+        for _ in range(n):
+            coll.insert_one({"column1": "test1", "column2": "value1"})
+        create_times.append(time.time() - start)
 
         # READ
-        start_time = time.time()
-        collection.find_one({"column1": "test1"})
-        print("MongoDB READ Time:", time.time() - start_time)
+        start = time.time()
+        for _ in range(n):
+            coll.find_one({"column1": "test1"})
+        read_times.append(time.time() - start)
 
         # UPDATE
-        start_time = time.time()
-        collection.update_one({"column1": "test1"}, {"$set": {"column1": "updated_value"}})
-        print("MongoDB UPDATE Time:", time.time() - start_time)
+        start = time.time()
+        for _ in range(n):
+            coll.update_one({"column1": "test1"}, {"$set": {"column1": "updated_value"}})
+        update_times.append(time.time() - start)
 
         # DELETE
-        start_time = time.time()
-        collection.delete_one({"column1": "updated_value"})
-        print("MongoDB DELETE Time:", time.time() - start_time)
+        start = time.time()
+        for _ in range(n):
+            coll.delete_one({"column1": "updated_value"})
+        delete_times.append(time.time() - start)
 
-    except Exception as e:
-        print("MongoDB CRUD Test failed:", e)
+    client.close()
+
+    return [
+        TEST_CASES,
+        create_times,
+        read_times,
+        update_times,
+        delete_times,
+        "MongoDB",
+        "orange"
+    ]

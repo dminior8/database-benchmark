@@ -41,7 +41,7 @@ CREATE TABLE users (
     first_name VARCHAR2(255) NOT NULL,
     last_name VARCHAR2(255) NOT NULL,
     phone VARCHAR2(14) NOT NULL,
-    email VARCHAR2(255) UNIQUE NOT NULL,
+    email VARCHAR2(255) NOT NULL,
     birth_date DATE,
     gender VARCHAR2(10) CHECK (gender IN ('male', 'female')),
     pesel VARCHAR2(11) NOT NULL

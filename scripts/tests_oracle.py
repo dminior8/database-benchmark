@@ -11,74 +11,112 @@ DB_CONFIG = {
     }
 }
 
-# Lista testów: liczba operacji CRUD
-TEST_CASES = [1_000_000, 2_000_000, 5_000_000, 10_000_000]
+TEST_CASES = [100, 200, 300, 500, 1_000, 5_000, 10_000, 15_000, 20_000]
 
-def single_test(num_operations):
-    """ Wykonuje test CRUD dla podanej liczby operacji """
-    try:
-        conn = oracledb.connect(
-            user=DB_CONFIG["oracle"]["user"],
-            password=DB_CONFIG["oracle"]["password"],
-            dsn=DB_CONFIG["oracle"]["dsn"],
-            mode=DB_CONFIG["oracle"]["mode"]
-        )
-        cursor = conn.cursor()
 
-        total_create, total_read, total_update, total_delete = 0, 0, 0, 0
+def single_test_oracle(num_operations):
+    """
+    Wykonuje num_operations operacji CRUD na Oracle i zwraca czasy w formacie:
+    [ TEST_CASES, create_times, read_times, update_times, delete_times, label, color ]
+    """
+    conn = oracledb.connect(
+        user=DB_CONFIG["oracle"]["user"],
+        password=DB_CONFIG["oracle"]["password"],
+        dsn=DB_CONFIG["oracle"]["dsn"],
+        mode=DB_CONFIG["oracle"]["mode"]
+    )
+    cursor = conn.cursor()
 
-        print(f"\n🔄 Test dla {num_operations:,} operacji CRUD...")
-        for i in range(num_operations):
-            if i % (num_operations // 10) == 0:
-                print(f"Postęp: {i:,}/{num_operations:,} operacji")
+    # Zerujemy sumy czasów
+    total_create = total_read = total_update = total_delete = 0.0
 
-            # CREATE
-            start_time = time.time()
-            cursor.execute("""
-                INSERT INTO users (user_id, first_name, last_name, phone, email, pesel, gender)
-                VALUES (users_seq.NEXTVAL, 'John', 'Doe', '123456789', 'john.doe@example.com', '12345678901', 'male')
-            """)
-            conn.commit()
-            total_create += time.time() - start_time
+    # CREATE
+    start = time.time()
+    for _ in range(num_operations):
+        cursor.execute("""
+            INSERT INTO users (
+                user_id, first_name, last_name,
+                phone, email, pesel, gender
+            ) VALUES (
+                users_seq.NEXTVAL, 'John', 'Doe',
+                '123456789', 'john.doe@example.com',
+                '12345678901', 'male'
+            )
+        """)
+    conn.commit()
+    total_create = time.time() - start
 
-            # READ
-            start_time = time.time()
-            cursor.execute("SELECT * FROM users WHERE first_name = 'John' AND last_name = 'Doe'")
-            cursor.fetchone()
-            total_read += time.time() - start_time
+    # READ
+    start = time.time()
+    for _ in range(num_operations):
+        cursor.execute("""
+            SELECT * FROM users
+            WHERE first_name = 'John' AND last_name = 'Doe'
+        """)
+        cursor.fetchone()
+    total_read = time.time() - start
 
-            # UPDATE
-            start_time = time.time()
-            cursor.execute("""
-                UPDATE users
-                SET first_name = 'Jane'
-                WHERE first_name = 'John' AND last_name = 'Doe'
-            """)
-            conn.commit()
-            total_update += time.time() - start_time
+    # UPDATE
+    start = time.time()
+    for _ in range(num_operations):
+        cursor.execute("""
+            UPDATE users
+            SET first_name = 'Jane'
+            WHERE first_name = 'John' AND last_name = 'Doe'
+        """)
+    conn.commit()
+    total_update = time.time() - start
 
-            # DELETE
-            start_time = time.time()
-            cursor.execute("""
-                DELETE FROM users
-                WHERE first_name = 'Jane' AND last_name = 'Doe'
-            """)
-            conn.commit()
-            total_delete += time.time() - start_time
+    # DELETE
+    start = time.time()
+    for _ in range(num_operations):
+        cursor.execute("""
+            DELETE FROM users
+            WHERE first_name = 'Jane' AND last_name = 'Doe'
+        """)
+    conn.commit()
+    total_delete = time.time() - start
 
-        cursor.close()
-        conn.close()
+    cursor.close()
+    conn.close()
 
-        # Podsumowanie
-        print("\n📊 *** PODSUMOWANIE ***")
-        print(f"🔹 {num_operations:,} operacji CREATE: {total_create:.2f} s (średnio {total_create / num_operations:.6f} s/op)")
-        print(f"🔹 {num_operations:,} operacji READ: {total_read:.2f} s (średnio {total_read / num_operations:.6f} s/op)")
-        print(f"🔹 {num_operations:,} operacji UPDATE: {total_update:.2f} s (średnio {total_update / num_operations:.6f} s/op)")
-        print(f"🔹 {num_operations:,} operacji DELETE: {total_delete:.2f} s (średnio {total_delete / num_operations:.6f} s/op)")
+    # Zwracamy jedną serię dla Oracle
+    return [
+        TEST_CASES,
+        total_create,
+        total_read,
+        total_update,
+        total_delete,
+        "Oracle",
+        "blue"
+    ]
 
-    except Exception as e:
-        print("Oracle CRUD Test failed:", e)
 
 def crud_oracle():
-    for test_case in TEST_CASES:
-        single_test(test_case)
+    """
+    Dla każdego n w TEST_CASES wywołuje single_test_oracle(n),
+    a potem zwraca listę czterech list czasów + etykietę i kolor.
+    """
+    create_times = []
+    read_times = []
+    update_times = []
+    delete_times = []
+
+    for n in TEST_CASES:
+        row = single_test_oracle(n)
+        # row = [TEST_CASES, c, r, u, d, "Oracle", "blue"]
+        _, c, r, u, d, _, _ = row
+        create_times.append(c)
+        read_times.append(r)
+        update_times.append(u)
+        delete_times.append(d)
+
+    return [
+        TEST_CASES,
+        create_times,
+        read_times,
+        update_times,
+        delete_times,
+        "Oracle",
+        "blue"
+    ]
