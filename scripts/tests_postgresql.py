@@ -51,7 +51,7 @@ def crud_postgres():
         # DELETE
         start = time.time()
         for _ in range(n):
-            cur.execute("DELETE FROM usersWHERE first_name = 'Jane' AND last_name = 'Doe';")
+            cur.execute("DELETE FROM users WHERE first_name = 'Jane' AND last_name = 'Doe';")
         conn.commit()
         delete_times.append(time.time() - start)
 
