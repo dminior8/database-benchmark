@@ -37,23 +37,21 @@ def crud_postgres():
         # READ
         start = time.time()
         for _ in range(n):
-            cur.execute("SELECT * FROM users LIMIT 1;")
+            cur.execute("SELECT * FROM users WHERE first_name = 'John' AND last_name = 'Doe';")
             cur.fetchone()
         read_times.append(time.time() - start)
 
         # UPDATE
         start = time.time()
         for _ in range(n):
-            cur.execute(
-                "UPDATE users SET first_name = 'Updated' WHERE first_name = 'John';"
-            )
+            cur.execute("UPDATE users SET first_name = 'Jane' WHERE first_name = 'John' AND last_name = 'Doe';")
         conn.commit()
         update_times.append(time.time() - start)
 
         # DELETE
         start = time.time()
         for _ in range(n):
-            cur.execute("DELETE FROM users WHERE first_name = 'Updated';")
+            cur.execute("DELETE FROM users WHERE first_name = 'Jane' AND last_name = 'Doe';")
         conn.commit()
         delete_times.append(time.time() - start)
 
