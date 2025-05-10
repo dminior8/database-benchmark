@@ -3,6 +3,7 @@ import pymongo
 from cassandra.cluster import Cluster
 import oracledb
 
+from charts import save_chart
 from databases.mongo.data_generator import generate_and_insert_data_mongo
 from databases.oracle.data_generator import generate_and_insert_data_oracle
 from databases.postgresql.data_generator import generate_and_insert_data_postgres
@@ -39,23 +40,24 @@ DB_CONFIG = {
     }
 }
 
+
 def check_postgres():
     try:
-        conn = psycopg2.connect(#database="postgres", user="postgres", password="admin")
+        conn = psycopg2.connect(  # database="postgres", user="postgres", password="admin")
             # **DB_CONFIG
             database="healthcare-postgres",
             user="healthcare",
             password="root",
             host="localhost",
-            port = 5433
+            port=5433
         )
-
 
         # conn.set_client_encoding('UTF8')
         conn.close()
         print("PostgreSQL is running!")
     except Exception as e:
         print("PostgreSQL connection failed:", e)
+
 
 def check_mongo():
     try:
@@ -65,6 +67,7 @@ def check_mongo():
     except Exception as e:
         print("MongoDB connection failed:", e)
 
+
 def check_cassandra():
     try:
         cluster = Cluster([DB_CONFIG["cassandra"]["host"]])
@@ -72,6 +75,7 @@ def check_cassandra():
         print("CassandraDB is running!")
     except Exception as e:
         print("Cassandra connection failed:", e)
+
 
 def check_oracle():
     try:
@@ -86,9 +90,10 @@ def check_oracle():
     except Exception as e:
         print("OracleDB connection failed:", e)
 
+
 if __name__ == "__main__":
     print("Checking database status...")
-    #time.sleep(10)  # Czekamy, aby dać kontenerom czas na uruchomienie
+    # time.sleep(10)  # Czekamy, aby dać kontenerom czas na uruchomienie
     check_postgres()
     check_mongo()
     check_cassandra()
@@ -100,17 +105,28 @@ if __name__ == "__main__":
     generate_and_insert_data_oracle()
     generate_and_insert_data_cassandra()
 
-
     print("\n\nStarting test...")
 
     print("\nRunning CRUD tests for Oracle...")
-    crud_oracle()
+    oracle = crud_oracle()
 
     print("\nRunning CRUD tests for Cassandra...")
-    crud_cassandra()
+    cassandra = crud_cassandra()
 
     print("\nRunning CRUD tests for MongoDB...")
-    crud_mongo()
+    mongo = crud_mongo()
 
     print("\nRunning CRUD tests for PostgreSQL...")
-    crud_postgres()
+    postgres = crud_postgres()
+
+    # Łączymy wyniki w jedną listę
+    all_rows = [oracle, cassandra, mongo, postgres]
+
+    # Rysujemy CREATE (operation_index=1)
+    save_chart("CREATE", all_rows, operation_index=1)
+    # Rysujemy READ (operation_index=2)
+    save_chart("READ", all_rows, operation_index=2)
+    # Rysujemy UPDATE (operation_index=3)
+    save_chart("UPDATE", all_rows, operation_index=3)
+    # Rysujemy READ (operation_index=2)
+    save_chart("DELETE", all_rows, operation_index=4)

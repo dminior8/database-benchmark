@@ -8,7 +8,7 @@ CREATE TABLE users (
     first_name VARCHAR(255) NOT NULL,
     last_name VARCHAR(255) NOT NULL,
     phone VARCHAR(14) NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL,
+    email VARCHAR(255) NOT NULL,
     birth_date DATE,
     gender gender_enum,
     pesel VARCHAR(11) NOT NULL
@@ -39,8 +39,8 @@ CREATE TABLE examinations (
     examination_date DATE,
     doctor_id INT NOT NULL,
     user_id INT NOT NULL,
-    FOREIGN KEY (doctor_id) REFERENCES doctors(doctor_id),
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
+    FOREIGN KEY (doctor_id) REFERENCES doctors(doctor_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
 -- Tabela danych podstawowych użytkownika
@@ -52,7 +52,7 @@ CREATE TABLE users_basic_data (
     diastolic_pressure INT,
     temperature DOUBLE PRECISION,
     entry_date DATE,
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
 -- Tabela krótkich wywiadów medycznych
@@ -63,7 +63,7 @@ CREATE TABLE short_medical_interviews (
     description VARCHAR(2000),
     smi_date DATE NOT NULL,
     user_id INT NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
 -- Tabela powiązań lekarzy z przychodniami
@@ -71,6 +71,6 @@ CREATE TABLE doctors_clinics (
     doctor_id INT NOT NULL,
     clinic_id INT NOT NULL,
     PRIMARY KEY (doctor_id, clinic_id),
-    FOREIGN KEY (doctor_id) REFERENCES doctors(doctor_id),
-    FOREIGN KEY (clinic_id) REFERENCES clinics(clinic_id)
+    FOREIGN KEY (doctor_id) REFERENCES doctors(doctor_id) ON DELETE CASCADE,
+    FOREIGN KEY (clinic_id) REFERENCES clinics(clinic_id) ON DELETE CASCADE
 );

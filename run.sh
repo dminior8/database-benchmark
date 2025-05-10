@@ -1,4 +1,3 @@
-#!/bin/bash
 echo "Starting containers..."
 
 # Remove old containers (optional)

@@ -11,38 +11,61 @@ DB_CONFIG = {
     }
 }
 
+TEST_CASES = [100, 200, 300, 500, 1_000, 5_000, 10_000, 15_000, 20_000]
+
+
 def crud_postgres():
-    try:
-        # Połączenie z bazą danych PostgreSQL
+    create_times = []
+    read_times = []
+    update_times = []
+    delete_times = []
+
+    for n in TEST_CASES:
         conn = psycopg2.connect(**DB_CONFIG["postgres"])
-        cursor = conn.cursor()
+        cur = conn.cursor()
 
         # CREATE
-        start_time = time.time()
-        cursor.execute("INSERT INTO users (first_name, last_name, phone, email, pesel) VALUES ('John', 'Doe', '123456789', 'johndoe@example.com', '12345678901');")
+        start = time.time()
+        for _ in range(n):
+            cur.execute(
+                "INSERT INTO users (first_name, last_name, phone, email, pesel) "
+                "VALUES ('John','Doe','123456789','johndoe@example.com','12345678901');"
+            )
         conn.commit()
-        print("PostgreSQL CREATE Time:", time.time() - start_time)
+        create_times.append(time.time() - start)
 
         # READ
-        start_time = time.time()
-        cursor.execute("SELECT * FROM users LIMIT 1;")
-        cursor.fetchone()
-        print("PostgreSQL READ Time:", time.time() - start_time)
+        start = time.time()
+        for _ in range(n):
+            cur.execute("SELECT * FROM users LIMIT 1;")
+            cur.fetchone()
+        read_times.append(time.time() - start)
 
         # UPDATE
-        start_time = time.time()
-        cursor.execute("UPDATE users SET first_name = 'Updated' WHERE first_name = 'John';")
+        start = time.time()
+        for _ in range(n):
+            cur.execute(
+                "UPDATE users SET first_name = 'Updated' WHERE first_name = 'John';"
+            )
         conn.commit()
-        print("PostgreSQL UPDATE Time:", time.time() - start_time)
+        update_times.append(time.time() - start)
 
         # DELETE
-        start_time = time.time()
-        cursor.execute("DELETE FROM users WHERE first_name = 'Updated';")
+        start = time.time()
+        for _ in range(n):
+            cur.execute("DELETE FROM users WHERE first_name = 'Updated';")
         conn.commit()
-        print("PostgreSQL DELETE Time:", time.time() - start_time)
+        delete_times.append(time.time() - start)
 
-        # Zamykanie kursora i połączenia
-        cursor.close()
+        cur.close()
         conn.close()
-    except Exception as e:
-        print("PostgreSQL CRUD Test failed:", e)
+
+    return [
+        TEST_CASES,
+        create_times,
+        read_times,
+        update_times,
+        delete_times,
+        "PostgreSQL",
+        "red"
+    ]
